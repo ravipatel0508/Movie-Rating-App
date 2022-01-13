@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:movie_rating/api_service/search_data.dart';
 
 void main() => runApp(const MyApp());
 
@@ -15,12 +16,18 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final TextEditingController controller = TextEditingController();
   Map<String, dynamic>? data;
+  late Future<SearchedData> searchedData;
   bool isLoading = true;
   String networkLoadingImage =
       "https://reactnativecode.com/wp-content/uploads/2018/02/Default_Image_Thumbnail.png";
 
+  @override
+  initState() {
+    super.initState();
+    searchedData = getTitleData();
+  }
 
-  Future getTitleData() async {
+  Future<SearchedData> getTitleData() async {
     String url =
         "https://www.omdbapi.com/?apikey=c1f93322&s=${controller.text}";
     http.Response response = await http.get(Uri.parse(url), headers: {
@@ -31,12 +38,12 @@ class _MyAppState extends State<MyApp> {
       setState(() {
         isLoading = false;
       });
-      return data = json.decode(response.body);
+      data = json.decode(response.body);
+      return SearchedData.fromJson(jsonDecode(response.body));
     } else {
       throw Exception('Failed to load post');
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -49,8 +56,8 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Movie Rating'),
         ),
-        body: FutureBuilder(
-          future: getTitleData(),
+        body: FutureBuilder<SearchedData>(
+          future: searchedData,
           builder: (context, snapshot) {
             return Container(
               padding: const EdgeInsets.all(10),
@@ -67,7 +74,10 @@ class _MyAppState extends State<MyApp> {
                     height: 20,
                   ),
                   data?["Response"] == "False"
-                      ? Container()
+                      ? Container(
+                          height: 10,
+                          color: Colors.accents[100],
+                        )
                       : Expanded(
                           child: ListView.separated(
                             shrinkWrap: true,
@@ -142,7 +152,7 @@ class _MyAppState extends State<MyApp> {
                                             ),
                                             const SizedBox(height: 5),
                                             Text(
-                                              '${data?["Search"][index]["Genre"]}',
+                                              snapshot.data?.imdbID ?? "error",
                                               style: const TextStyle(
                                                 fontSize: 15,
                                                 color: Colors.grey,
