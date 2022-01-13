@@ -17,6 +17,8 @@ class _MyAppState extends State<MyApp> {
   Map<String, dynamic>? data;
   bool isLoading = true;
 
+  String networkLoadingImage = "https://cdn2.iconfinder.com/data/icons/documents-and-files-v-2/100/doc-03-512.png";
+
   Future getTitleData() async {
     String url =
         "https://www.omdbapi.com/?apikey=c1f93322&t=${controller.text}";
@@ -55,11 +57,12 @@ class _MyAppState extends State<MyApp> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    const TextField(
-                      decoration: InputDecoration(
+                    TextField(
+                      decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: 'Movie Title',
                       ),
+                      controller: controller,
                     ),
                     const SizedBox(
                       height: 20,
@@ -67,33 +70,109 @@ class _MyAppState extends State<MyApp> {
                     data?["Response"] == "False"
                         ? Container()
                         : Card(
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(10),
-                                  child: Image.network(
-                                    data?["Poster"] ?? "https://reactnativecode.com/wp-content/uploads/2018/02/Default_Image_Thumbnail.png",
-                                    fit: BoxFit.cover,
-                                    width: 100,
-                                    height: 150,
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 20,
-                                ),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Stack(
+                                    clipBehavior: Clip.none,
                                     children: [
-                                      Text('Your Other Widgets if you want'),
-                                      const SizedBox(height: 20),
-                                      Text('Your Other Widgets if you want'),
+                                      Image.network(
+                                        data?["Poster"] == "N/A"
+                                            ? networkLoadingImage
+                                            : data?["Poster"] ??
+                                                networkLoadingImage,
+                                        //data?["Poster"],
+                                        fit: BoxFit.fitHeight,
+                                        width: 125,
+                                        height: 170,
+                                      ),
+                                      Positioned(
+                                        bottom: 3,
+                                        right: -15,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            boxShadow: const [
+                                              BoxShadow(
+                                                color: Colors.black54,
+                                                blurRadius: 5,
+                                                offset: Offset(0, 5),
+                                              )
+                                            ],
+                                            color: Colors.blue[300],
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(10.0),
+                                            child: Text(
+                                              data?["imdbRating"] ?? "N/A",
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
                                     ],
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(
+                                    width: 20,
+                                  ),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${data?["Title"]} (${data?["Year"]})',
+                                          style: const TextStyle(fontSize: 20),
+                                        ),
+                                        const SizedBox(height: 5),
+                                        Text(
+                                          '${data?["Genre"]}',
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 15),
+                                        //create cylinder timinng container
+                                        Container(
+                                          height: 20,
+                                          width: 80,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                const BorderRadius.all(
+                                              Radius.circular(10),
+                                            ),
+                                            color: Colors.amber[600],
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              '${data?["Runtime"]}',
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Text(
+                                          '${data?["Plot"]}',
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            color: Colors.grey,
+                                          ),
+                                          maxLines: 3,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                   ],
