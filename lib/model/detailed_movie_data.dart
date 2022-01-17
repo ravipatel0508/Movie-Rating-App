@@ -1,7 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
 
-part 'detailed_movie_data.g.dart';
-
 @JsonSerializable()
 class DetailedMovieData{
   final String? movieTitle;

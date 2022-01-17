@@ -1,12 +1,12 @@
-import 'package:json_annotation/json_annotation.dart';
+import 'dart:developer';
 
-part 'search_data.g.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 @JsonSerializable()
 class SearchedData {
   final List<dynamic> search;
-  final String? totalResults;
-  final String? response;
+  final String totalResults;
+  final String response;
 
   SearchedData({
     required this.search,
@@ -21,25 +21,27 @@ class SearchedData {
 
   factory SearchedData.fromJson(Map<String, dynamic> json) {
    
-    var search = json['Search'] as List;
+    List search = json['Search'] ?? [];
     List<dynamic> searchedList =
         search.map((e) => SearchedDataList.fromJson(e)).toList();
 
+    log(json['Response']);
+    
     return SearchedData(
       search: searchedList,
-      totalResults: json['totalResults'] as String,
-      response: json['Response'] as String,
+      totalResults: json['totalResults'] ?? "1",
+      response: json['Response'],
     );
   }
 }
 
 
 class SearchedDataList {
-  final String? title;
-  final String? year;
-  final String? imdbID;
-  final String? type;
-  final String? poster;
+  final String title;
+  final String year;
+  final String imdbID;
+  final String type;
+  final String poster;
 
   SearchedDataList({
     required this.title,
@@ -51,11 +53,11 @@ class SearchedDataList {
 
   factory SearchedDataList.fromJson(Map<String, dynamic> json) {
     return SearchedDataList(
-      title: json['Title'] as String,
-      year: json['Year'] as String,
-      imdbID: json['imdbID'] as String,
-      type: json['Type'] as String,
-      poster: json['Poster'] as String,
+      title: json['Title'] ?? "",
+      year: json['Year'] ?? "",
+      imdbID: json['imdbID'] ?? "",
+      type: json['Type'] ?? "",
+      poster: json['Poster'] ?? "N/A",
     );
   }
 }
