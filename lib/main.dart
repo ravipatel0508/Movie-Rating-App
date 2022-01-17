@@ -15,9 +15,8 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final TextEditingController controller = TextEditingController();
-  Map<String, dynamic>? data;
   late Future<SearchedData> searchedData;
-  bool isLoading = true;
+  bool dataNotFound = true;
   String networkLoadingImage =
       "https://reactnativecode.com/wp-content/uploads/2018/02/Default_Image_Thumbnail.png";
 
@@ -30,16 +29,18 @@ class _MyAppState extends State<MyApp> {
   Future<SearchedData> getTitleData() async {
     String url =
         "https://www.omdbapi.com/?apikey=c1f93322&s=${controller.text}";
-    http.Response response = await http.get(Uri.parse(url), headers: {
-      "X-CMC_PRO_API_KEY": "c1f93322",
-      "Accept": "application/json"
-    });
+    http.Response response = await http.get(Uri.parse(url));
+
+    var responseData = json.decode(response.body);
     if (response.statusCode == 200) {
-      setState(() {
-        isLoading = false;
-      });
-      data = json.decode(response.body);
-      return SearchedData.fromJson(jsonDecode(response.body));
+      if (responseData['Response'] == 'True') {
+        return SearchedData.fromJson(jsonDecode(response.body));
+      } else {
+        setState(() {
+          dataNotFound = true;
+        });
+        throw Exception('No data found');
+      }
     } else {
       throw Exception('Failed to load post');
     }
@@ -73,7 +74,7 @@ class _MyAppState extends State<MyApp> {
                   const SizedBox(
                     height: 20,
                   ),
-                  data?["Response"] == "False"
+                  snapshot.data?.response == "False"
                       ? Container(
                           height: 10,
                           color: Colors.accents[100],
@@ -81,7 +82,7 @@ class _MyAppState extends State<MyApp> {
                       : Expanded(
                           child: ListView.separated(
                             shrinkWrap: true,
-                            itemCount: data?["Search"]?.length ?? 0,
+                            itemCount: snapshot.data?.search.length ?? 0,
                             itemBuilder: (context, index) {
                               return Card(
                                 child: Padding(
@@ -94,13 +95,13 @@ class _MyAppState extends State<MyApp> {
                                         clipBehavior: Clip.none,
                                         children: [
                                           Image.network(
-                                            data?["Search"][index]["Poster"] ==
+                                            snapshot.data!.search[index]
+                                                        .title ==
                                                     "N/A"
                                                 ? networkLoadingImage
-                                                : data?["Search"][index]
-                                                        ["Poster"] ??
+                                                : snapshot.data?.search[index]
+                                                        .poster ??
                                                     networkLoadingImage,
-                                            //data?["Poster"],
                                             fit: BoxFit.fitHeight,
                                             width: 125,
                                             height: 170,
@@ -124,8 +125,8 @@ class _MyAppState extends State<MyApp> {
                                                 padding:
                                                     const EdgeInsets.all(10.0),
                                                 child: Text(
-                                                  data?["Search"][index]
-                                                          ["imdbRating"] ??
+                                                  snapshot.data?.search[index]
+                                                          .imdbID ??
                                                       "N/A",
                                                   style: const TextStyle(
                                                     color: Colors.white,
@@ -146,20 +147,21 @@ class _MyAppState extends State<MyApp> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              '${data?["Search"][index]["Title"]} (${data?["Search"][index]["Year"]})',
+                                              //'${data?["Search"][index]["Title"]} (${data?["Search"][index]["Year"]})',
+                                              '${snapshot.data!.search[index].title} (${snapshot.data!.search[index].year})',
                                               style:
                                                   const TextStyle(fontSize: 20),
                                             ),
                                             const SizedBox(height: 5),
                                             Text(
-                                              snapshot.data?.imdbID ?? "error",
+                                              snapshot.data?.response ??
+                                                  "error",
                                               style: const TextStyle(
                                                 fontSize: 15,
                                                 color: Colors.grey,
                                               ),
                                             ),
                                             const SizedBox(height: 15),
-                                            //create cylinder timinng container
                                             Container(
                                               height: 20,
                                               width: 80,
@@ -170,10 +172,11 @@ class _MyAppState extends State<MyApp> {
                                                 ),
                                                 color: Colors.amber[600],
                                               ),
-                                              child: Center(
+                                              child: const Center(
                                                 child: Text(
-                                                  '${data?["Search"][index]["Runtime"]}',
-                                                  style: const TextStyle(
+                                                  //'${data?["Search"][index]["Runtime"]}',
+                                                  'RUNTIME',
+                                                  style: TextStyle(
                                                     color: Colors.white,
                                                     fontWeight: FontWeight.bold,
                                                   ),
@@ -181,9 +184,10 @@ class _MyAppState extends State<MyApp> {
                                               ),
                                             ),
                                             const SizedBox(height: 10),
-                                            Text(
-                                              '${data?["Search"][index]["Plot"]}',
-                                              style: const TextStyle(
+                                            const Text(
+                                              //'${data?["Search"][index]["Plot"]}',
+                                              'PLOT',
+                                              style: TextStyle(
                                                 fontSize: 13,
                                                 color: Colors.grey,
                                               ),
