@@ -22,6 +22,7 @@ class SearchedData {
   factory SearchedData.fromJson(Map<String, dynamic> json) {
    
     List search = json['Search'] ?? [];
+    log(search.length.toString());
     List<dynamic> searchedList =
         search.map((e) => SearchedDataList.fromJson(e)).toList();
 
