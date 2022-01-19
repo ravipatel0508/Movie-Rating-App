@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:movie_rating/model/search_data.dart';
@@ -118,6 +117,7 @@ class _MyAppState extends State<MyApp> {
                     MaterialPageRoute(
                       builder: (context) => MovieDetails(
                         data: snapshot!.search[index],
+                        title: snapshot!.search[index].title,
                       ),
                     ),
                   );
@@ -166,8 +166,6 @@ class _MyAppState extends State<MyApp> {
           mainAxisSpacing: 10,
         ),
         itemCount: snapshot?.search.length ?? 0,
-        // gridDelegate:
-        //     const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
@@ -176,6 +174,7 @@ class _MyAppState extends State<MyApp> {
                 MaterialPageRoute(
                   builder: (context) => MovieDetails(
                     data: snapshot!.search[index],
+                    title: snapshot!.search[index].title,
                   ),
                 ),
               );
@@ -229,6 +228,7 @@ class _MyAppState extends State<MyApp> {
                 MaterialPageRoute(
                   builder: (context) => MovieDetails(
                     data: snapshot!.search[index],
+                    title: snapshot!.search[index].title,
                   ),
                 ),
               );
