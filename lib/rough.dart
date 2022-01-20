@@ -19,16 +19,10 @@ class _MyAppState extends State<MyApp> {
   final TextEditingController controller = TextEditingController();
   Map<String, dynamic>? data;
   SearchedData? snapshot;
-  // Future<SearchedData>? searchedData;
+
   bool isLoading = true;
   String networkLoadingImage =
       "https://reactnativecode.com/wp-content/uploads/2018/02/Default_Image_Thumbnail.png";
-
-  // @override
-  // initState() {
-  //   super.initState();
-  //   searchedData = getTitleData();
-  // }
 
   Future getSearchedData() async {
     String url =
@@ -39,15 +33,10 @@ class _MyAppState extends State<MyApp> {
     });
 
     if (response.statusCode == 200) {
-      // setState(() {
-      //   isLoading = true;
-      // });
-      //data = json.decode(response.body);
       setState(() {
-      snapshot = SearchedData.fromJson(jsonDecode(response.body));
+        snapshot = SearchedData.fromJson(jsonDecode(response.body));
       });
       log(controller.text + snapshot!.response.toString());
-      //return "------------------------------------------success";
     } else {
       throw Exception('Failed to load post');
     }
@@ -71,7 +60,10 @@ class _MyAppState extends State<MyApp> {
               Row(
                 children: [
                   getTextField(),
-                  IconButton(onPressed: getSearchedData, icon: const Icon(Icons.search)),
+                  IconButton(
+                    onPressed: getSearchedData,
+                    icon: const Icon(Icons.search),
+                  ),
                 ],
               ),
               const SizedBox(
@@ -87,7 +79,8 @@ class _MyAppState extends State<MyApp> {
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                     )
-                  : getCard()
+                  : getCardDetails()
+              //: getMovieGrid()
               // : Container(
               //   color: Colors.blue,
               //   child: Text(
@@ -99,6 +92,125 @@ class _MyAppState extends State<MyApp> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  getCardDetails() {
+    return Expanded(
+      child: GridView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: snapshot?.search.length ?? 0,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: snapshot?.search.length ?? 1,
+          crossAxisSpacing: 100,
+          mainAxisSpacing: 100,
+          childAspectRatio: 2 / 3,
+        ),
+        itemBuilder: (context, index) {
+          return GridTile(
+            child: Center(
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MovieDetails(
+                        data: snapshot!.search[index],
+                        title: snapshot!.search[index].title,
+                      ),
+                    ),
+                  );
+                },
+                child: Stack(
+                    children: [
+                      Hero(
+                        tag: 'ImageHero ${snapshot!.search[index].imdbID}',
+                        child: Image.network(
+                          snapshot!.search[index].poster == "N/A"
+                              ? networkLoadingImage
+                              : snapshot!.search[index].poster ??
+                                  networkLoadingImage,
+                          fit: BoxFit.scaleDown,
+                        ),
+                      ),
+                      Positioned(
+                        child: Text(
+                          "${snapshot!.search[index].title} (${snapshot!.search[index].title})",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        bottom: 10,
+                        right: 10,
+                      )
+                    ],
+                  ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  getMovieGrid() {
+    return Expanded(
+      child: GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 1.0,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+        ),
+        itemCount: snapshot?.search.length ?? 0,
+        itemBuilder: (context, index) {
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MovieDetails(
+                    data: snapshot!.search[index],
+                    title: snapshot!.search[index].title,
+                  ),
+                ),
+              );
+            },
+            child: Stack(
+              alignment: Alignment.bottomCenter,
+              children: [
+                Hero(
+                  tag: 'ImageHero ${snapshot!.search[index].imdbID}',
+                  child: Image.network(
+                    snapshot!.search[index].poster == "N/A"
+                        ? networkLoadingImage
+                        : snapshot!.search[index].poster ?? networkLoadingImage,
+                    fit: BoxFit.scaleDown,
+                  ),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.center,
+                      colors: [
+                        Colors.black.withOpacity(0.5),
+                        Colors.black.withOpacity(0.0),
+                      ],
+                    ),
+                  ),
+                ),
+                Text(
+                  snapshot!.search[index].title,
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -116,6 +228,7 @@ class _MyAppState extends State<MyApp> {
                 MaterialPageRoute(
                   builder: (context) => MovieDetails(
                     data: snapshot!.search[index],
+                    title: snapshot!.search[index].title,
                   ),
                 ),
               );
@@ -127,51 +240,19 @@ class _MyAppState extends State<MyApp> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(15),
-                          child: Hero(
-                            tag: 'ImageHero ${snapshot!.search[index].imdbID}',
-                            child: Image.network(
-                              snapshot!.search[index].poster == "N/A"
-                                  ? networkLoadingImage
-                                  : snapshot!.search[index].poster ??
-                                      networkLoadingImage,
-                              height: 200,
-                              fit: BoxFit.fill,
-                            ),
-                          ),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: Hero(
+                        tag: 'ImageHero ${snapshot!.search[index].imdbID}',
+                        child: Image.network(
+                          snapshot!.search[index].poster == "N/A"
+                              ? networkLoadingImage
+                              : snapshot!.search[index].poster ??
+                                  networkLoadingImage,
+                          height: 200,
+                          fit: BoxFit.fill,
                         ),
-                        Positioned(
-                          bottom: 3,
-                          right: -15,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Colors.black54,
-                                  blurRadius: 5,
-                                  offset: Offset(0, 5),
-                                )
-                              ],
-                              color: Colors.blue[300],
-                              shape: BoxShape.circle,
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Text(
-                                snapshot!.search[index].imdbID ?? "N/A",
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                     const SizedBox(
                       width: 20,
