@@ -1,16 +1,7 @@
 # movie_rating
 
-A new Flutter project.
 
-## Getting Started
+https://user-images.githubusercontent.com/63658662/150687092-ebe907ab-a09f-4a46-9bee-4f9450052f5f.mp4
 
-This project is a starting point for a Flutter application.
+<img src="https://user-images.githubusercontent.com/63658662/150687086-37b7d82a-a021-4795-9f99-7f4660416616.jpg" height="500">    <img src="https://user-images.githubusercontent.com/63658662/150687089-6ed892a4-7e32-4cb3-9348-919e62891d3e.jpg" height="500">    <img src="https://user-images.githubusercontent.com/63658662/150687091-1fb0fc2d-e117-454a-9569-8b19f6f82b8f.jpg" height="500">
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
